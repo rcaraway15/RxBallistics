@@ -1,6 +1,6 @@
 // Service worker: cache-first app shell so the calculator works fully offline.
 // Bump VERSION whenever any cached file changes so installed apps pick up the update.
-const VERSION = 'v1.0.0';
+const VERSION = 'v1.1.0';
 const CACHE = `ballistics-${VERSION}`;
 const ASSETS = [
   './',
@@ -18,6 +18,7 @@ const ASSETS = [
   './icons/icon-512.png',
   './icons/icon-maskable-512.png',
   './icons/apple-touch-icon.png',
+  './icons/logo-128.png',
 ];
 
 self.addEventListener('install', (event) => {

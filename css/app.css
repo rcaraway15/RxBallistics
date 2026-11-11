@@ -54,6 +54,8 @@ body {
   border-bottom: 1px solid var(--line);
 }
 .app-header h1 { margin: 0; font-size: 1.3rem; letter-spacing: 0.02em; }
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand img { width: 40px; height: 40px; border-radius: 9px; flex: 0 0 auto; }
 
 main { max-width: 900px; margin: 0 auto; padding: 12px; }
 

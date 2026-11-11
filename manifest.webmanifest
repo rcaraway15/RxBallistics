@@ -1,6 +1,6 @@
 {
-  "name": "Ballistic Calculator",
-  "short_name": "Ballistics",
+  "name": "RxBallistics",
+  "short_name": "RxBallistics",
   "description": "Personal point-mass ballistic calculator",
   "start_url": "./",
   "scope": "./",
