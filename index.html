@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Ballistics</title>
+  <meta name="description" content="Personal point-mass ballistic calculator">
+  <meta name="theme-color" content="#0d1117">
+  <meta name="color-scheme" content="dark">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Ballistics">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <header class="app-header">
+    <h1>Ballistics</h1>
+    <button type="button" id="theme-toggle" class="icon-btn" aria-label="Toggle red night mode" title="Night (red) mode">◐</button>
+  </header>
+
+  <main>
+    <!-- Profiles -->
+    <section class="card" aria-labelledby="h-profile">
+      <h2 id="h-profile">Profile</h2>
+      <div class="profile-row">
+        <label class="sr-only" for="profile-select">Saved profile</label>
+        <select id="profile-select"></select>
+        <span id="profile-dirty" class="dirty" hidden title="Unsaved changes">●</span>
+      </div>
+      <div class="btn-grid">
+        <button type="button" data-action="save">Save</button>
+        <button type="button" data-action="save-new">Save as…</button>
+        <button type="button" data-action="rename">Rename</button>
+        <button type="button" data-action="duplicate">Duplicate</button>
+        <button type="button" data-action="delete" class="danger">Delete</button>
+        <button type="button" data-action="export">Export</button>
+        <button type="button" data-action="import">Import</button>
+      </div>
+      <input type="file" id="import-file" accept="application/json,.json" hidden>
+      <p id="profile-msg" class="msg" role="status" aria-live="polite"></p>
+    </section>
+
+    <form id="inputs" autocomplete="off" novalidate>
+      <!-- Load & rifle -->
+      <section class="card" aria-labelledby="h-load">
+        <h2 id="h-load">Load &amp; Rifle</h2>
+        <div class="grid">
+          <label>Bullet weight <span class="unit">gr</span>
+            <input name="weightGr" inputmode="decimal" data-num required></label>
+          <div class="field">
+            <label for="bc">BC</label>
+            <div class="combo">
+              <input id="bc" name="bc" inputmode="decimal" data-num required>
+              <div class="seg" role="radiogroup" aria-label="Drag model">
+                <label><input type="radio" name="dragTable" value="G1"><span>G1</span></label>
+                <label><input type="radio" name="dragTable" value="G7" checked><span>G7</span></label>
+              </div>
+            </div>
+          </div>
+          <label>Muzzle velocity <span class="unit">fps</span>
+            <input name="muzzleVelocityFps" inputmode="decimal" data-num required></label>
+          <label>Sight height <span class="unit">in</span>
+            <input name="sightHeightIn" inputmode="decimal" data-num required></label>
+          <label>Zero range <span class="unit">yd</span>
+            <input name="zeroRangeYd" inputmode="decimal" data-num required></label>
+          <label>Caliber <span class="unit">in</span>
+            <input name="caliberIn" inputmode="decimal" data-num></label>
+          <label>Bullet length <span class="unit">in</span>
+            <input name="lengthIn" inputmode="decimal" data-num></label>
+          <div class="field">
+            <label for="twistIn">Twist <span class="unit">1:x in</span></label>
+            <div class="combo">
+              <input id="twistIn" name="twistIn" inputmode="decimal" data-num>
+              <div class="seg" role="radiogroup" aria-label="Twist direction">
+                <label><input type="radio" name="twistDirection" value="R" checked><span>R</span></label>
+                <label><input type="radio" name="twistDirection" value="L"><span>L</span></label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <details class="zero-conds">
+          <summary>Zero conditions <span id="zero-summary" class="muted"></span></summary>
+          <p class="hint">The weather when you zeroed. Saved with the profile. Pressure is the weather-app (sea-level) value.</p>
+          <div class="grid">
+            <label>Temperature <span class="unit">°F</span>
+              <span class="signed"><input name="zTempF" inputmode="decimal" data-num data-signed><button type="button" class="pm" tabindex="-1" aria-label="Toggle sign">±</button></span></label>
+            <label>Humidity <span class="unit">%</span>
+              <input name="zHumidity" inputmode="decimal" data-num></label>
+            <label>Altitude <span class="unit">ft</span>
+              <span class="signed"><input name="zAltitudeFt" inputmode="decimal" data-num data-signed><button type="button" class="pm" tabindex="-1" aria-label="Toggle sign">±</button></span></label>
+            <label>Pressure <span class="unit">inHg</span>
+              <input name="zPressureInHg" inputmode="decimal" data-num></label>
+          </div>
+          <div class="btn-row">
+            <button type="button" id="zero-standard">Standard atmosphere</button>
+            <button type="button" id="zero-from-env">Use current environment</button>
+          </div>
+        </details>
+      </section>
+
+      <!-- Shot -->
+      <section class="card" aria-labelledby="h-shot">
+        <h2 id="h-shot">Shot</h2>
+        <div class="grid">
+          <label>Wind speed <span class="unit">mph</span>
+            <input name="windMph" inputmode="decimal" data-num></label>
+          <label>Wind from <span class="unit">o'clock</span>
+            <select name="windClock" id="windClock"></select></label>
+          <label>Shooting angle <span class="unit">° (+up / −down)</span>
+            <span class="signed"><input name="angleDeg" inputmode="decimal" data-num data-signed><button type="button" class="pm" tabindex="-1" aria-label="Toggle sign">±</button></span></label>
+          <div class="clock-wrap" aria-hidden="true"><svg id="clock" viewBox="-50 -50 100 100"></svg></div>
+        </div>
+      </section>
+
+      <!-- Environment -->
+      <section class="card" aria-labelledby="h-env">
+        <h2 id="h-env">Environment <span class="muted small">(not saved in profiles)</span></h2>
+        <div class="grid">
+          <label>Temperature <span class="unit">°F</span>
+            <span class="signed"><input name="tempF" inputmode="decimal" data-num data-signed><button type="button" class="pm" tabindex="-1" aria-label="Toggle sign">±</button></span></label>
+          <label>Humidity <span class="unit">%</span>
+            <input name="humidity" inputmode="decimal" data-num></label>
+          <label>Altitude <span class="unit">ft</span>
+            <span class="signed"><input name="altitudeFt" inputmode="decimal" data-num data-signed><button type="button" class="pm" tabindex="-1" aria-label="Toggle sign">±</button></span></label>
+          <label>Pressure <span class="unit">inHg (weather app)</span>
+            <input name="pressureInHg" inputmode="decimal" data-num></label>
+        </div>
+        <h3>Coriolis <span class="muted small">(optional: enter both)</span></h3>
+        <div class="grid">
+          <label>Latitude <span class="unit">° (−S)</span>
+            <span class="signed"><input name="latitudeDeg" inputmode="decimal" data-num data-signed><button type="button" class="pm" tabindex="-1" aria-label="Toggle sign">±</button></span></label>
+          <label>Azimuth <span class="unit">° true</span>
+            <input name="azimuthDeg" inputmode="decimal" data-num></label>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="h-range">
+        <h2 id="h-range">Range table</h2>
+        <label>Max range <span class="unit">yd</span>
+          <select name="maxRangeYd" id="maxRangeYd"></select></label>
+      </section>
+    </form>
+
+    <!-- Output -->
+    <section class="card output" aria-labelledby="h-out">
+      <h2 id="h-out">Solution</h2>
+      <div id="banners" aria-live="polite"></div>
+      <p id="solve-error" class="error" role="alert" hidden></p>
+      <dl id="summary" class="summary"></dl>
+      <div class="table-wrap" tabindex="0" aria-label="Trajectory table, scrolls horizontally">
+        <table id="table">
+          <thead>
+            <tr>
+              <th scope="col">Range<br><span class="unit">yd</span></th>
+              <th scope="col">Drop<br><span class="unit">in</span></th>
+              <th scope="col" class="dial">Elev<br><span class="unit">MRAD ↑</span></th>
+              <th scope="col">Wind<br><span class="unit">in</span></th>
+              <th scope="col" class="dial">Wind<br><span class="unit">MRAD</span></th>
+              <th scope="col">Vel<br><span class="unit">fps</span></th>
+              <th scope="col">Energy<br><span class="unit">ft-lb</span></th>
+              <th scope="col">TOF<br><span class="unit">s</span></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <p class="hint legend">
+        Elev: MRAD to dial (+ = up). Wind: L/R = direction to dial or hold (includes spin drift<span id="legend-coriolis"></span>).
+        <span class="swatch caution"></span> below Mach 1.2 &nbsp;<span class="swatch warning"></span> below Mach 1.0
+      </p>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <p>Point-mass solver, G1/G7 standard drag. Check against real impacts before you rely on it.</p>
+    <p id="sw-status" class="muted small"></p>
+  </footer>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
