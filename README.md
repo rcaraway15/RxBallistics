@@ -1,0 +1,2 @@
+# RxBallistics
+Optimized ballistic calculator
