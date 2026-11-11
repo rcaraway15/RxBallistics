@@ -206,7 +206,7 @@ tr.warning td:first-child { box-shadow: inset 4px 0 0 var(--warning); background
 
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
-/* Narrow phones: use the full width so Range → Wind MRAD fits without scrolling */
+/* Narrow phones: use the full width so more columns fit without scrolling */
 @media (max-width: 480px) {
   main { padding: 8px 6px; }
   .card.output { padding: 12px 6px; }

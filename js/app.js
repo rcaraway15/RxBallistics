@@ -226,12 +226,12 @@ function renderTable(res, zeroRangeYd) {
     if (Math.abs(r.rangeYd - zeroRangeYd) < 1e-6) tr.classList.add('zero-row');
     const cells = [
       [String(r.rangeYd)],
-      [fmt(r.dropIn, 1)],
       [fmt(r.elevationMrad, 1), 'dial'],
-      [fmtLR(-r.windIn, 1)], // drift right → correct left
       [fmtLR(r.windageMrad, 1), 'dial'],
       [fmtInt(r.velocityFps)],
       [fmtInt(r.energyFtLb)],
+      [fmt(r.dropIn, 1)],
+      [fmtLR(-r.windIn, 1)], // drift right → correct left
       [r.timeS.toFixed(3)],
     ];
     for (const [text, cls] of cells) {
