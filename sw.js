@@ -1,6 +1,6 @@
 // Service worker: cache-first app shell so the calculator works fully offline.
 // Bump VERSION whenever any cached file changes so installed apps pick up the update.
-const VERSION = 'v1.2.0';
+const VERSION = 'v1.2.1';
 const CACHE = `ballistics-${VERSION}`;
 const ASSETS = [
   './',
